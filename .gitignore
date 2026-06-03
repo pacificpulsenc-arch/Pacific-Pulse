@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Dossiers de travail (non publiés)
+screenshots/
+temporary screenshots/
+backups/
+node_modules/
+
+# Archives
+*.zip
+
+# Captures / images source non utilisées par le site
+Capture*.png
+about-image.png
+ref-text.png
+7633ab2e-*.png
+PP Logo.png
+PP brand_guidelines_white.html
+
+# Config locale VS Code
+.vscode/
+
+# Config interne Claude Code (ne pas publier)
+.claude/
+CLAUDE.md

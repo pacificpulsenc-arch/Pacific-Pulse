@@ -1,0 +1,13 @@
+{
+  "name": "pacific-pulse",
+  "version": "1.0.0",
+  "description": "Site vitrine Pacific Pulse - agence web Nouvelle-Caledonie",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "private": true
+}

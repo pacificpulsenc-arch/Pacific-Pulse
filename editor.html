@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pacific Pulse — Éditeur Visuel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0c0c0f;
+      color: #e8eaf0;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Left: site preview ───────────────────── */
+    #preview-wrap {
+      flex: 1 1 0%;
+      position: relative;
+      border-right: 1px solid #1e2035;
+      overflow: hidden;
+    }
+
+    #preview-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* scale iframe for narrow screens */
+    #iframe-scaler {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Right: info panel ────────────────────── */
+    #panel {
+      width: 320px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid #1e2035;
+      flex-shrink: 0;
+    }
+    .panel-header h1 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+    .panel-header p {
+      font-size: 12px;
+      color: #5a5f7a;
+      margin-top: 3px;
+    }
+
+    .panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Mode toggle */
+    .mode-toggle {
+      display: flex;
+      background: #13141f;
+      border: 1px solid #1e2035;
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .mode-btn {
+      flex: 1;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      color: #5a5f7a;
+      background: transparent;
+      transition: all 0.15s ease;
+    }
+    .mode-btn.active {
+      background: #001fc9;
+      color: #fff;
+    }
+
+    /* Selected element card */
+    #selected-card {
+      background: #13141f;
+      border: 1px solid #1e2035;
+      border-radius: 10px;
+      padding: 14px;
+      transition: border-color 0.2s ease;
+    }
+    #selected-card.has-selection {
+      border-color: rgba(0,31,201,0.5);
+    }
+    .card-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #5a5f7a;
+      margin-bottom: 10px;
+    }
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(0,31,201,0.12);
+      border: 1px solid rgba(0,31,201,0.25);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #6690ff;
+      margin-bottom: 8px;
+    }
+    .el-tag {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .el-text {
+      font-size: 12px;
+      color: #5a5f7a;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .el-hint {
+      margin-top: 10px;
+      font-size: 11px;
+      color: #3a3f5a;
+      line-height: 1.5;
+    }
+    .el-hint strong { color: #5a5f7a; }
+
+    /* Description builder */
+    #desc-card {
+      background: #13141f;
+      border: 1px solid #1e2035;
+      border-radius: 10px;
+      padding: 14px;
+    }
+    #desc-output {
+      font-size: 12px;
+      color: #e8eaf0;
+      background: #0c0c0f;
+      border: 1px solid #1e2035;
+      border-radius: 6px;
+      padding: 10px 12px;
+      min-height: 56px;
+      line-height: 1.6;
+      user-select: text;
+    }
+    #desc-output em { color: #6690ff; font-style: normal; }
+    .copy-btn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 8px;
+      background: rgba(0,31,201,0.1);
+      border: 1px solid rgba(0,31,201,0.25);
+      border-radius: 6px;
+      color: #6690ff;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .copy-btn:hover { background: rgba(0,31,201,0.2); }
+    .copy-btn.copied { color: #4ade80; border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.08); }
+
+    /* Sections map */
+    #sections-card {
+      background: #13141f;
+      border: 1px solid #1e2035;
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .sec-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 9px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      text-decoration: none;
+    }
+    .sec-item:hover { background: #1a1b2a; }
+    .sec-item.current { background: rgba(0,31,201,0.1); }
+    .sec-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #2a2d44;
+      flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+    .sec-item.current .sec-dot { background: #001fc9; }
+    .sec-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: #8890aa;
+    }
+    .sec-item.current .sec-name { color: #fff; }
+
+    /* Tips */
+    .tip {
+      font-size: 11px;
+      color: #3a3f5a;
+      line-height: 1.6;
+      padding: 10px 12px;
+      background: #0c0c0f;
+      border: 1px solid #1a1b2a;
+      border-radius: 8px;
+    }
+    .tip strong { color: #5a5f7a; display: block; margin-bottom: 4px; }
+
+    /* Scrollbar */
+    .panel-body::-webkit-scrollbar { width: 4px; }
+    .panel-body::-webkit-scrollbar-track { background: transparent; }
+    .panel-body::-webkit-scrollbar-thumb { background: #1e2035; border-radius: 2px; }
+
+    /* Status bar */
+    #status-bar {
+      padding: 8px 16px;
+      border-top: 1px solid #1e2035;
+      font-size: 11px;
+      color: #3a3f5a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    #status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #3a3f5a;
+      transition: background 0.3s ease;
+    }
+    #status-dot.active { background: #4ade80; }
+  </style>
+</head>
+<body>
+
+<!-- ── Left: iframe preview ───────────────────────────── -->
+<div id="preview-wrap">
+  <div id="iframe-scaler">
+    <iframe id="preview-iframe" src="index.html" title="Aperçu Pacific Pulse"></iframe>
+  </div>
+</div>
+
+<!-- ── Right: inspector panel ────────────────────────── -->
+<div id="panel">
+  <div class="panel-header">
+    <h1>Éditeur Visuel</h1>
+    <p>Cliquez sur un élément pour l'identifier</p>
+  </div>
+
+  <div class="panel-body">
+
+    <!-- Mode toggle -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="btn-inspect" onclick="setMode('inspect')">Inspecter</button>
+      <button class="mode-btn"        id="btn-browse"  onclick="setMode('browse')">Navigation</button>
+    </div>
+
+    <!-- Selected element -->
+    <div id="selected-card">
+      <div class="card-label">Élément sélectionné</div>
+      <div id="el-section" class="section-badge" style="display:none;"></div>
+      <div id="el-tag"  class="el-tag">Aucun élément sélectionné</div>
+      <div id="el-text" class="el-text"></div>
+      <div id="el-hint" class="el-hint" style="display:none;">
+        Copiez la description ci-dessous<br>et dites à Claude ce que vous voulez changer.
+      </div>
+    </div>
+
+    <!-- Description à copier -->
+    <div id="desc-card" style="display:none;">
+      <div class="card-label">Description pour Claude</div>
+      <div id="desc-output"></div>
+      <button class="copy-btn" id="copy-btn" onclick="copyDesc()">Copier la description</button>
+    </div>
+
+    <!-- Sections map -->
+    <div id="sections-card">
+      <div class="card-label" style="margin-bottom:6px;">Sections</div>
+      <a class="sec-item" onclick="scrollTo('nav')">
+        <span class="sec-dot" id="dot-nav"></span>
+        <span class="sec-name">Navigation</span>
+      </a>
+      <a class="sec-item" onclick="scrollTo('hero-wrap')">
+        <span class="sec-dot" id="dot-hero-wrap"></span>
+        <span class="sec-name">Hero</span>
+      </a>
+      <a class="sec-item" onclick="scrollTo('about')">
+        <span class="sec-dot" id="dot-about"></span>
+        <span class="sec-name">Qui sommes-nous</span>
+      </a>
+      <a class="sec-item" onclick="scrollTo('services')">
+        <span class="sec-dot" id="dot-services"></span>
+        <span class="sec-name">Services</span>
+      </a>
+      <a class="sec-item" onclick="scrollTo('certifications')">
+        <span class="sec-dot" id="dot-certifications"></span>
+        <span class="sec-name">Certifications</span>
+      </a>
+      <a class="sec-item" onclick="scrollTo('cta-block')">
+        <span class="sec-dot" id="dot-cta-block"></span>
+        <span class="sec-name">Bloc CTA</span>
+      </a>
+      <a class="sec-item" onclick="scrollTo('contact')">
+        <span class="sec-dot" id="dot-contact"></span>
+        <span class="sec-name">Contact</span>
+      </a>
+    </div>
+
+    <div class="tip">
+      <strong>Comment utiliser</strong>
+      1. Mode <em>Inspecter</em> activé : survolez et cliquez un élément<br>
+      2. Copiez la description générée<br>
+      3. Collez-la dans le chat et dites ce que vous voulez modifier
+    </div>
+
+  </div>
+
+  <div id="status-bar">
+    <span id="status-dot"></span>
+    <span id="status-text">En attente du chargement...</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var iframe  = document.getElementById('preview-iframe');
+  var mode    = 'inspect';
+  var lastHovered = null;
+  var lastSelected = null;
+
+  var SECTION_MAP = {
+    'nav':            'Navigation',
+    'hero-wrap':      'Hero',
+    'hero':           'Hero',
+    'about':          'Qui sommes-nous',
+    'services':       'Services',
+    'certifications': 'Certifications',
+    'cta-block':      'Bloc CTA',
+    'contact':        'Contact',
+    'footer-inner':   'Footer',
+  };
+
+  var SECTION_IDS = Object.keys(SECTION_MAP);
+
+  function getSection(el) {
+    var node = el;
+    while (node && node.tagName !== 'BODY') {
+      if (node.id && SECTION_MAP[node.id]) return SECTION_MAP[node.id];
+      node = node.parentElement;
+    }
+    return 'Page';
+  }
+
+  function getSelector(el) {
+    if (el.id) return '#' + el.id;
+    var cls = Array.from(el.classList).filter(function(c) {
+      return !c.startsWith('inspector-');
+    }).slice(0, 2).join('.');
+    return el.tagName.toLowerCase() + (cls ? '.' + cls : '');
+  }
+
+  function getDescription(el) {
+    var tag     = el.tagName.toLowerCase();
+    var section = getSection(el);
+    var text    = el.textContent.trim().replace(/\s+/g, ' ').slice(0, 60);
+    var labels  = {
+      h1: 'titre principal', h2: 'titre de section', h3: 'sous-titre',
+      p:  'paragraphe', a: 'lien', button: 'bouton', img: 'image',
+      nav: 'navigation', section: 'section', div: 'bloc', span: 'texte',
+      input: 'champ de formulaire', textarea: 'zone de texte', form: 'formulaire',
+      footer: 'footer', label: 'label',
+    };
+    var elLabel = labels[tag] || tag;
+    if (el.id) elLabel = elLabel + ' #' + el.id;
+    var out = 'Dans la section <em>' + section + '</em>, le <em>' + elLabel + '</em>';
+    if (text && text.length > 1 && tag !== 'div' && tag !== 'section') {
+      out += ' qui contient "<em>' + text + (text.length >= 60 ? '...' : '') + '</em>"';
+    }
+    return out;
+  }
+
+  window.setMode = function(m) {
+    mode = m;
+    document.getElementById('btn-inspect').classList.toggle('active', m === 'inspect');
+    document.getElementById('btn-browse').classList.toggle('active',  m === 'browse');
+
+    var doc = iframe.contentDocument;
+    if (!doc) return;
+
+    if (m === 'inspect') {
+      doc.body.style.cursor = 'crosshair';
+      doc.querySelectorAll('a').forEach(function(a) { a.style.pointerEvents = 'none'; });
+    } else {
+      doc.body.style.cursor = '';
+      doc.querySelectorAll('a').forEach(function(a) { a.style.pointerEvents = ''; });
+      clearHover();
+    }
+  };
+
+  window.scrollTo = function(id) {
+    var doc = iframe.contentDocument;
+    if (!doc) return;
+    var el = doc.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  window.copyDesc = function() {
+    var out = document.getElementById('desc-output');
+    var text = out.innerText;
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copié !';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = 'Copier la description';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  };
+
+  function clearHover() {
+    if (lastHovered) {
+      lastHovered.classList.remove('inspector-hover');
+      lastHovered = null;
+    }
+  }
+
+  function updatePanel(el) {
+    var section   = getSection(el);
+    var selector  = getSelector(el);
+    var textRaw   = el.textContent.trim().replace(/\s+/g, ' ').slice(0, 80);
+    var desc      = getDescription(el);
+
+    // Section badge
+    var secBadge = document.getElementById('el-section');
+    secBadge.textContent = section;
+    secBadge.style.display = 'inline-flex';
+
+    // Element tag
+    document.getElementById('el-tag').textContent = selector;
+
+    // Text content
+    var textEl = document.getElementById('el-text');
+    if (textRaw && el.tagName !== 'DIV' && el.tagName !== 'SECTION') {
+      textEl.textContent = '"' + textRaw + (textRaw.length >= 80 ? '...' : '') + '"';
+    } else {
+      textEl.textContent = '';
+    }
+
+    // Hint
+    document.getElementById('el-hint').style.display = 'block';
+    document.getElementById('selected-card').classList.add('has-selection');
+
+    // Description output
+    var descCard = document.getElementById('desc-card');
+    descCard.style.display = 'block';
+    document.getElementById('desc-output').innerHTML = desc;
+
+    // Highlight section dot
+    SECTION_IDS.forEach(function(id) {
+      var dot = document.getElementById('dot-' + id);
+      if (dot) dot.style.background = (SECTION_MAP[id] === section) ? '#001fc9' : '';
+    });
+  }
+
+  iframe.addEventListener('load', function() {
+    var doc = iframe.contentDocument;
+    if (!doc) {
+      document.getElementById('status-text').textContent = 'Impossible de charger — essayez un serveur local';
+      return;
+    }
+
+    // Inject inspector CSS
+    var style = doc.createElement('style');
+    style.id = 'inspector-style';
+    style.textContent = [
+      '.inspector-hover {',
+      '  outline: 2px solid rgba(0,31,201,0.9) !important;',
+      '  outline-offset: 1px !important;',
+      '  cursor: crosshair !important;',
+      '}',
+      '.inspector-selected {',
+      '  outline: 2px solid #4d7cff !important;',
+      '  outline-offset: 1px !important;',
+      '  background-color: rgba(0,31,201,0.06) !important;',
+      '}',
+    ].join('\n');
+    doc.head.appendChild(style);
+
+    // Disable links in inspect mode initially
+    doc.querySelectorAll('a').forEach(function(a) { a.style.pointerEvents = 'none'; });
+    doc.body.style.cursor = 'crosshair';
+
+    // Hover
+    doc.addEventListener('mouseover', function(e) {
+      if (mode !== 'inspect') return;
+      if (lastHovered) lastHovered.classList.remove('inspector-hover');
+      lastHovered = e.target;
+      if (lastHovered && lastHovered.tagName !== 'BODY' && lastHovered.tagName !== 'HTML') {
+        lastHovered.classList.add('inspector-hover');
+      }
+    });
+
+    doc.addEventListener('mouseout', function(e) {
+      if (lastHovered) lastHovered.classList.remove('inspector-hover');
+    });
+
+    // Click to select
+    doc.addEventListener('click', function(e) {
+      if (mode !== 'inspect') return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (lastSelected) lastSelected.classList.remove('inspector-selected');
+      lastSelected = e.target;
+      if (lastSelected) lastSelected.classList.add('inspector-selected');
+
+      updatePanel(lastSelected);
+
+      document.getElementById('status-dot').classList.add('active');
+      document.getElementById('status-text').textContent = 'Élément sélectionné';
+    });
+
+    // Scroll spy for sections
+    var sectionEls = SECTION_IDS.map(function(id) {
+      return doc.getElementById(id);
+    }).filter(Boolean);
+
+    var scrollObs = new (iframe.contentWindow.IntersectionObserver)(function(entries) {
+      entries.forEach(function(entry) {
+        var dot = document.getElementById('dot-' + entry.target.id);
+        if (dot) dot.style.background = entry.isIntersecting ? '#001fc9' : '';
+      });
+    }, { root: null, threshold: 0.3 });
+
+    sectionEls.forEach(function(el) { scrollObs.observe(el); });
+
+    // Ready
+    document.getElementById('status-dot').classList.add('active');
+    document.getElementById('status-text').textContent = 'Prêt — cliquez un élément';
+  });
+
+})();
+</script>
+
+</body>
+</html>

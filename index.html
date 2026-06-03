@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Pacific Pulse - Agence de création de sites web en Nouvelle-Calédonie. Sites performants, optimisés SEO et propulsés par l'IA pour booster votre visibilité.">
+  <title>Pacific Pulse - Agence Web Nouvelle-Calédonie</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* ─── Design tokens ───────────────────────────────── */
+    :root {
+      --c-blue:       #001fc9;
+      --c-blue-hi:    #0028e0;
+      --c-blue-dim:   rgba(0,31,201,0.08);
+      --c-bg:         #ffffff;
+      --c-bg-1:       #f0f3ff;
+      --c-bg-2:       #e6eaff;
+      --c-text:       #0b1033;
+      --c-muted:      rgba(11,16,51,0.52);
+      --c-border:     rgba(0,31,201,0.14);
+      --r:            4px;
+      --r-pill:       9999px;
+    }
+
+    /* ─── Reset ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--c-bg);
+      color: var(--c-text);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    img { max-width: 100%; }
+    /* prevent flex/grid children from being forced wide by image intrinsics */
+    #hero > *, .about-grid > *, .bento > *, .bcard-split > *,
+    .contact-grid > *, .hero-copy, .hero-card { min-width: 0; }
+
+    /* ─── Grain overlay (fixed pseudo, GPU-safe) ──────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 300px;
+    }
+
+    /* ─── Keyframes ───────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* ─── Scroll reveal ───────────────────────────────── */
+    .rev {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity 0.72s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.72s cubic-bezier(0.16,1,0.3,1);
+    }
+    .rev.in { opacity: 1; transform: translateY(0); }
+    .rev-d1 { transition-delay: 0.09s; }
+    .rev-d2 { transition-delay: 0.18s; }
+    .rev-d3 { transition-delay: 0.28s; }
+    .rev-d4 { transition-delay: 0.40s; }
+
+    /* ─── Reduced motion ──────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .rev { opacity: 1 !important; transform: none !important; transition: none !important; }
+    }
+
+    /* ─── Navigation ──────────────────────────────────── */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 68px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      border-bottom: 1px solid transparent;
+      /* hidden during hero, revealed at #about */
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.45s cubic-bezier(0.16,1,0.3,1),
+                  opacity 0.3s ease,
+                  background 0.3s ease,
+                  border-bottom-color 0.3s ease;
+    }
+    #nav.nav-visible {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom-color: var(--c-border);
+      box-shadow: 0 1px 24px rgba(0,31,201,0.07);
+    }
+    .nav-inner {
+      width: 100%;
+      max-width: 1320px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-logo-img {
+      height: 20px;
+      width: auto;
+      display: block;
+      flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--c-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 450;
+      padding: 7px 14px;
+      border-radius: var(--r-pill);
+      transition: color 0.2s ease, background 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--c-text); background: rgba(0,31,201,0.06); }
+    .nav-cta { flex-shrink: 0; }
+
+    /* ─── Buttons ─────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--c-blue);
+      outline-offset: 3px;
+    }
+    .btn:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: var(--c-blue);
+      color: #fff;
+      padding: 11px 22px;
+      border-radius: var(--r-pill);
+      box-shadow: 0 4px 18px rgba(0,31,201,0.38), 0 1px 4px rgba(0,0,0,0.5);
+    }
+    .btn-primary:hover {
+      background: var(--c-blue-hi);
+      box-shadow: 0 6px 26px rgba(0,31,201,0.52), 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: rgba(11,16,51,0.65);
+      padding: 10px 22px;
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(11,16,51,0.18);
+    }
+    .btn-ghost:hover {
+      color: var(--c-text);
+      border-color: rgba(0,31,201,0.4);
+      background: rgba(0,31,201,0.04);
+    }
+    .btn-lg { font-size: 15px; padding: 14px 32px; }
+
+    /* ─── Shader canvas ──────────────────────────────── */
+    #shader-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ─── Hero ────────────────────────────────────────── */
+    #hero-wrap {
+      background: #ffffff;
+      position: relative;
+    }
+    #hero {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: center;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 104px 32px 40px;
+      position: relative;
+      z-index: 1;
+      perspective: 1000px;
+    }
+    .hero-copy {
+      max-width: 1000px;
+      margin-bottom: 40px;
+      animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.08s both;
+    }
+    .hero-h1 {
+      font-size: clamp(1.4rem, 2.4vw, 2rem);
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      color: rgba(11,16,51,0.7);
+    }
+    .hero-logo-img {
+      height: clamp(22px, 2.6vw, 32px);
+      width: auto;
+      display: block;
+      margin: 0 auto 6px;
+    }
+    .hero-h1 .hero-big {
+      display: block;
+      font-size: clamp(2.6rem, 6.5vw, 5.5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-top: 8px;
+      color: var(--c-text);
+    }
+    .hero-h1 .hero-big em {
+      font-style: italic;
+      color: #8b90a3;
+    }
+
+    /* ── Hero scroll-tilt card (Aceternity container scroll) ── */
+    .hero-card {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      height: 26rem;
+      border: 4px solid #6C6C6C;
+      padding: 8px;
+      background: #222222;
+      border-radius: 30px;
+      box-shadow:
+        0 0 #0000004d,
+        0 9px 20px #0000004a,
+        0 37px 37px #00000042,
+        0 84px 50px #00000026,
+        0 149px 60px #0000000a,
+        0 233px 65px #00000003;
+      transform: rotateX(0deg) scale(1);
+      transform-origin: top center;
+      will-change: transform;
+      animation: fadeIn 1s ease 0.4s both;
+    }
+    .hero-card-inner {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #f3f4f6;
+    }
+    .hero-card-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: left top;
+      display: block;
+    }
+    @media (min-width: 768px) {
+      .hero-card { height: 40rem; padding: 18px; }
+    }
+
+    /* Flatten as the user scrolls the first viewport (works at page top) */
+    @keyframes hero-card-flatten {
+      from { transform: rotateX(22deg) scale(1.04); }
+      to   { transform: rotateX(0deg)  scale(1); }
+    }
+    /* Mobile-only one-shot entrance (reliable on Safari/iOS, no scroll-timeline) */
+    @keyframes heroCardIn {
+      from { opacity: 0; transform: rotateX(20deg) scale(1.03) translateY(22px); }
+      to   { opacity: 1; transform: rotateX(0deg)  scale(1)    translateY(0); }
+    }
+    @supports (animation-timeline: scroll()) {
+      @media (prefers-reduced-motion: no-preference) {
+        .hero-card {
+          animation: hero-card-flatten linear both;
+          animation-timeline: scroll(root);
+          animation-range: 0 70vh;
+        }
+      }
+    }
+
+    /* ─── Stats rings (About) ────────────────────────── */
+    .about-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .stat-card {
+      background: rgba(0,31,201,0.06);
+      border: 1px solid rgba(0,31,201,0.18);
+      border-radius: var(--r);
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: border-color 0.25s ease;
+    }
+    .stat-card:hover { border-color: rgba(0,31,201,0.4); }
+    .stat-ring-wrap {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+    }
+    .stat-ring-svg {
+      width: 64px;
+      height: 64px;
+      display: block;
+    }
+    .ring-bg    { transition: none; }
+    .ring-stroke {
+      stroke-dashoffset: 163.36;
+      transition: stroke-dashoffset 1.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .stat-number {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--c-blue);
+    }
+    .stat-text h4 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--c-text);
+      margin-bottom: 2px;
+    }
+    .stat-sublabel {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--c-blue);
+      margin-bottom: 6px;
+    }
+    .stat-text p {
+      font-size: 12.5px;
+      color: var(--c-muted);
+      line-height: 1.55;
+    }
+
+    /* ─── About ───────────────────────────────────────── */
+    #about { background: var(--c-bg-1); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-h2 {
+      font-size: clamp(2rem, 3.4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.032em;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+    .about-p {
+      font-size: 16px;
+      line-height: 1.78;
+      color: var(--c-muted);
+      margin-bottom: 16px;
+      max-width: 52ch;
+    }
+    .about-img-wrap {
+      position: relative;
+      border-radius: var(--r);
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 4px 16px rgba(0,31,201,0.12);
+    }
+    .about-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .about-img-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom right, rgba(0,31,201,0.18), transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ─── Services ────────────────────────────────────── */
+    #services { background: var(--c-bg); }
+    .sec-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--c-blue);
+      margin-bottom: 12px;
+    }
+    .sec-h2 {
+      font-size: clamp(2rem, 3.4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.032em;
+      line-height: 1.1;
+      max-width: 22ch;
+      margin-bottom: 48px;
+    }
+    .bento {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .bcard {
+      background: var(--c-bg-1);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r);
+      overflow: hidden;
+      transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .bcard:hover {
+      border-color: rgba(0,31,201,0.44);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 44px rgba(0,31,201,0.13), 0 4px 14px rgba(0,0,0,0.55);
+    }
+    .bcard-full { grid-column: 1 / -1; }
+    .bcard-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 260px;
+    }
+    .bcard-img {
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+      display: block;
+    }
+    .bcard-body { padding: 28px 30px; }
+    .bcard-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--c-blue-dim);
+      border: 1px solid rgba(0,31,201,0.25);
+      border-radius: var(--r-pill);
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(180,200,255,0.88);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .bcard-body h3 {
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.022em;
+      margin-bottom: 10px;
+    }
+    .bcard-body p {
+      font-size: 15px;
+      line-height: 1.66;
+      color: var(--c-muted);
+    }
+    /* AI card with gradient background */
+    .bcard.grad {
+      background: linear-gradient(145deg, #000c50, #0019b0, var(--c-blue));
+      border-color: rgba(0,31,201,0.45);
+    }
+    .bcard.grad .bcard-tag {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.78);
+    }
+    .bcard.grad .bcard-body h3 { color: #fff; }
+    .bcard.grad .bcard-body p  { color: rgba(255,255,255,0.68); }
+    /* Tech logos row (white) */
+    .tech-logos {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      margin-top: 24px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,0.18);
+    }
+    .tech-logos img {
+      height: 26px;
+      width: auto;
+      opacity: 0.92;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .tech-logos img:hover { opacity: 1; transform: translateY(-2px); }
+    /* force colored logos to pure white */
+    .tech-logos img.logo-whiten { filter: brightness(0) invert(1); }
+    /* Community card split layout */
+    .bcard-split-img {
+      position: relative;
+      overflow: hidden;
+    }
+    .bcard-split-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bcard-split-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0,8,32,0.68), transparent 50%);
+      pointer-events: none;
+    }
+
+    /* ─── 3D web-design scenes (Pacific Pulse) ───────── */
+    .scene3d {
+      position: relative;
+      width: 100%;
+      height: 230px;
+      perspective: 850px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(ellipse 75% 85% at 50% 42%, rgba(0,31,201,0.12), transparent 70%),
+        linear-gradient(160deg, #eef1f8 0%, #e3e8f2 100%);
+    }
+    .scene3d.scene-fill { height: 100%; min-height: 260px; }
+    /* faint brand grid backdrop */
+    .scene3d::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,31,201,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,31,201,0.05) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    /* Scene A — floating 3D UI layers (web design) */
+    .layers {
+      position: relative;
+      width: 230px;
+      height: 152px;
+      transform-style: preserve-3d;
+      animation: layers-spin 9s ease-in-out infinite;
+    }
+    @keyframes layers-spin {
+      0%, 100% { transform: rotateX(14deg) rotateY(-24deg); }
+      50%      { transform: rotateX(14deg) rotateY(20deg); }
+    }
+    .layer {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      border: 1.5px solid rgba(0,31,201,0.32);
+      background: rgba(255,255,255,0.82);
+      box-shadow: 0 16px 34px rgba(0,31,201,0.14);
+      backface-visibility: hidden;
+    }
+    .layer.l3 { transform: translateZ(-46px) translateY(14px); opacity: 0.55; }
+    .layer.l2 { transform: translateZ(-22px) translateY(7px);  opacity: 0.78; }
+    .layer.l1 { transform: translateZ(28px); padding: 12px; }
+    /* mini webpage inside front layer */
+    .ui-bar {
+      display: block;
+      height: 9px; width: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #001fc9 0 22px, rgba(0,31,201,0.18) 28px);
+      margin-bottom: 10px;
+    }
+    .ui-hero {
+      display: block;
+      height: 46px; width: 100%;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #001fc9, #4d7cff);
+      margin-bottom: 10px;
+    }
+    .ui-line { display: block; height: 7px; border-radius: 4px; background: rgba(0,31,201,0.22); margin-bottom: 7px; }
+    .ui-line.short { width: 60%; }
+
+    /* Scene B — rotating brand-grid cube (digital structure) */
+    .gridcube {
+      position: relative;
+      width: 116px;
+      height: 116px;
+      transform-style: preserve-3d;
+      animation: cube-spin 16s linear infinite;
+    }
+    @keyframes cube-spin {
+      from { transform: rotateX(-24deg) rotateY(0deg); }
+      to   { transform: rotateX(-24deg) rotateY(360deg); }
+    }
+    .cube-face {
+      position: absolute;
+      width: 116px;
+      height: 116px;
+      border: 1.5px solid rgba(0,31,201,0.5);
+      background:
+        linear-gradient(rgba(0,31,201,0.14) 1px, transparent 1px) 0 0 / 19px 19px,
+        linear-gradient(90deg, rgba(0,31,201,0.14) 1px, transparent 1px) 0 0 / 19px 19px,
+        rgba(0,31,201,0.06);
+    }
+    .cf-front  { transform: translateZ(58px); }
+    .cf-back   { transform: rotateY(180deg) translateZ(58px); }
+    .cf-right  { transform: rotateY(90deg)  translateZ(58px); }
+    .cf-left   { transform: rotateY(-90deg) translateZ(58px); }
+    .cf-top    { transform: rotateX(90deg)  translateZ(58px); }
+    .cf-bottom { transform: rotateX(-90deg) translateZ(58px); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .layers, .gridcube { animation: none; }
+    }
+
+    /* ─── Certifications ──────────────────────────────── */
+    #certifications {
+      background: linear-gradient(160deg, #eef1f8 0%, #e3e8f2 100%);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* Pacific islands map — zoom tour (NC → Wallis & Futuna → Tahiti) */
+    .globe-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .map3d {
+      position: relative;
+      width: 900px;
+      height: 520px;
+      transform-origin: 50% 50%;
+      animation: map-tour 22s ease-in-out infinite;
+    }
+    @keyframes map-tour {
+      0%, 10%   { transform: translate(520px, -221px)  scale(2.6); }  /* Nouvelle-Calédonie */
+      21%       { transform: translate(0px, 0px)        scale(1.05); } /* vue large */
+      33%, 43%  { transform: translate(-39px, 338px)   scale(2.6); }  /* Wallis & Futuna */
+      55%       { transform: translate(0px, 0px)        scale(1.05); }
+      66%, 76%  { transform: translate(-637px, -91px)  scale(2.6); }  /* Tahiti */
+      88%       { transform: translate(0px, 0px)        scale(1.05); }
+      100%      { transform: translate(520px, -221px)  scale(2.6); }  /* retour NC */
+    }
+    /* faint brand grid that scales with the map */
+    .map-grid {
+      position: absolute;
+      inset: -40%;
+      background-image:
+        linear-gradient(rgba(0,31,201,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,31,201,0.06) 1px, transparent 1px);
+      background-size: 46px 46px;
+      -webkit-mask-image: radial-gradient(ellipse 55% 55% at 50% 50%, #000 30%, transparent 75%);
+              mask-image: radial-gradient(ellipse 55% 55% at 50% 50%, #000 30%, transparent 75%);
+    }
+    .isl {
+      position: absolute;
+      filter: drop-shadow(0 3px 5px rgba(0,15,90,0.45));
+    }
+    .isl svg { display: block; overflow: visible; }
+    .isl svg path,
+    .isl svg ellipse {
+      fill: url(#islGrad);
+      stroke: #bcd0ff;
+      stroke-width: 2.4;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      paint-order: stroke fill;
+    }
+    /* soft pulsing halo behind each island */
+    .isl::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 30px; height: 30px;
+      margin: -15px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(30,80,255,0.55);
+      animation: isl-ping 2.8s ease-out infinite;
+    }
+    @keyframes isl-ping {
+      0%   { transform: scale(0.5); opacity: 0.85; }
+      100% { transform: scale(3); opacity: 0; }
+    }
+    /* positions on the 900x520 plane (relative Pacific layout) */
+    .isl-nc { left: 100px; top: 300px; }   /* southwest */
+    .isl-wf { left: 420px; top: 95px;  }   /* north */
+    .isl-th { left: 640px; top: 250px; }   /* east */
+    .isl-nc::after { animation-delay: 0s; }
+    .isl-wf::after { animation-delay: 0.9s; }
+    .isl-th::after { animation-delay: 1.8s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .map3d { animation: none; transform: scale(1.05); }
+      .isl::after { animation: none; }
+    }
+    #certifications h2 {
+      font-size: clamp(2rem, 3.4vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -0.032em;
+      line-height: 1.1;
+      max-width: 26ch;
+      margin: 0 auto 18px;
+    }
+    #certifications .cert-sub {
+      font-size: 17px;
+      color: var(--c-muted);
+      max-width: 52ch;
+      line-height: 1.7;
+      margin: 0 auto 52px;
+    }
+    .cert-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .cert-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--c-blue);
+      border: 1px solid var(--c-blue);
+      border-radius: var(--r-pill);
+      padding: 12px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0,31,201,0.28);
+    }
+    .cert-pill img { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ─── CTA block ───────────────────────────────────── */
+    #cta-block {
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding: 120px 32px;
+      background: var(--c-bg-1);
+    }
+    #cta-block .cta-bg     { display: none; }
+    #cta-block .cta-overlay { display: none; }
+    #cta-block .cta-content { position: relative; z-index: 2; max-width: 680px; margin: 0 auto; }
+    #cta-block h2 {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -0.038em;
+      line-height: 1.06;
+      margin-bottom: 18px;
+      color: var(--c-text);
+    }
+    #cta-block p {
+      font-size: 18px;
+      color: var(--c-muted);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    /* ─── Contact ─────────────────────────────────────── */
+    #contact { background: var(--c-bg); }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .contact-h2 {
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    .contact-sub {
+      font-size: 16px;
+      color: var(--c-muted);
+      margin-bottom: 40px;
+      line-height: 1.65;
+    }
+    form { display: flex; flex-direction: column; gap: 20px; }
+    .fg { display: flex; flex-direction: column; gap: 6px; }
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(11,16,51,0.6);
+      letter-spacing: 0.01em;
+    }
+    .fi {
+      background: rgba(0,31,201,0.04);
+      border: 1px solid rgba(0,31,201,0.18);
+      border-radius: var(--r);
+      color: var(--c-text);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+    }
+    .fi::placeholder { color: rgba(11,16,51,0.32); }
+    .fi:focus {
+      border-color: var(--c-blue);
+      background: rgba(0,31,201,0.14);
+      box-shadow: 0 0 0 3px rgba(0,31,201,0.18);
+    }
+    textarea.fi { min-height: 130px; resize: vertical; }
+    #form-success {
+      display: none;
+      background: rgba(0,31,201,0.09);
+      border: 1px solid rgba(0,31,201,0.28);
+      border-radius: var(--r);
+      padding: 24px 20px;
+      text-align: center;
+      color: var(--c-text);
+      font-weight: 500;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    #form-success svg { display: block; margin: 0 auto 12px; color: #60a5fa; }
+
+    /* Contact info */
+    .ci-wrap { padding-top: 76px; }
+    .ci-wrap h3 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 36px;
+    }
+    .ci {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 28px;
+    }
+    .ci-icon {
+      width: 42px; height: 42px;
+      background: var(--c-blue-dim);
+      border: 1px solid var(--c-border);
+      border-radius: var(--r);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .ci-icon svg { width: 18px; height: 18px; color: rgba(160,190,255,0.82); }
+    .ci-text span {
+      display: block;
+      font-size: 11px;
+      color: var(--c-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .ci-text a, .ci-text p {
+      font-size: 15px;
+      color: var(--c-text);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+    .ci-text a:hover { color: rgba(160,190,255,0.9); }
+
+    /* ─── Liquid glass sections ──────────────────────── */
+    .lg-section { position: relative; overflow: hidden; }
+
+    /* Distorted gradient layer — the liquid part */
+    .lg-distort {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse 130% 90% at 20% 40%, rgba(0,31,201,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 90% 120% at 80% 70%, rgba(0,15,130,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 60% at 55% 20%, rgba(0,31,201,0.05) 0%, transparent 50%);
+      filter: url("#glass-filter");
+    }
+
+    /* Rim / edge shadows — the glass part */
+    .lg-rim {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      box-shadow:
+        inset 0  1px 0    rgba(255,255,255,0.9),
+        inset 0 -1px 0    rgba(0,31,201,0.08),
+        inset 0  0  120px rgba(0,31,201,0.03);
+      border-top:    1px solid rgba(255,255,255,0.8);
+      border-bottom: 1px solid rgba(0,31,201,0.1);
+    }
+
+    /* Keep all direct children above the glass layers */
+    .lg-section > *:not(.lg-distort):not(.lg-rim):not(.cta-bg):not(.cta-overlay):not(.globe-bg) {
+      position: relative;
+      z-index: 1;
+    }
+
+    #cta-block .cta-glass { display: none; }
+    #cta-block .cta-content { z-index: 2; }
+
+    /* ─── Footer ──────────────────────────────────────── */
+    footer {
+      background: var(--c-bg-1);
+      border-top: 1px solid var(--c-border);
+      padding: 36px 32px;
+    }
+    .footer-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .footer-logo-img { height: 18px; width: auto; display: block; }
+    .footer-copy { font-size: 13px; color: var(--c-muted); }
+
+    /* ─── Mobile menu ─────────────────────────────────── */
+    #hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      color: var(--c-text);
+      border-radius: var(--r);
+      transition: background 0.2s ease;
+    }
+    #hamburger:hover { background: rgba(255,255,255,0.06); }
+    #mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 45;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(20px);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    #mobile-menu.open { display: flex; }
+    #menu-close {
+      position: absolute;
+      top: 20px; right: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--c-muted);
+      padding: 10px;
+      border-radius: var(--r);
+      transition: color 0.2s ease;
+    }
+    #menu-close:hover { color: var(--c-text); }
+    .m-link {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--c-text);
+      text-decoration: none;
+      padding: 10px 28px;
+      border-radius: var(--r-pill);
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .m-link:hover { background: rgba(0,31,201,0.06); }
+
+    /* ─── Animated button (chevron slide) ────────────── */
+    .btn-animated {
+      position: relative;
+      overflow: hidden;
+    }
+    /* texte s'efface au hover */
+    .btn-animated .btn-text {
+      position: relative;
+      z-index: 1;
+      transition: opacity 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+    .btn-animated:hover .btn-text { opacity: 0; }
+    /* overlay = exactement la taille du bouton, glisse depuis la droite */
+    .btn-animated .btn-icon {
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateX(calc(100% - 40px));
+      transition: transform 0.5s cubic-bezier(0.16,1,0.3,1);
+      z-index: 2;
+    }
+    .btn-animated:hover .btn-icon { transform: translateX(0); }
+    .btn-animated:active                { transform: scale(0.97); }
+
+    /* ─── Section wrapper ─────────────────────────────── */
+    .sec {
+      padding: 96px 32px;
+    }
+    .con {
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    /* ─── Responsive ──────────────────────────────────── */
+    @media (max-width: 767px) {
+      .sec { padding: 64px 20px; }
+      #nav { padding: 0 18px; height: 60px; }
+      .nav-links { display: none; }
+      #hamburger { display: flex; align-items: center; justify-content: center; }
+      .nav-logo-img { height: 17px; }
+
+      /* Hero: contained, no overflow */
+      #hero {
+        padding: 88px 20px 48px;
+        min-height: auto;
+        align-items: stretch;
+      }
+      .hero-copy { width: 100%; max-width: 100%; margin-bottom: 30px; }
+      .hero-h1 .hero-big { overflow-wrap: break-word; }
+      .hero-logo-img { height: 18px; margin-bottom: 10px; }
+      .hero-h1 { font-size: 15px; }
+      .hero-h1 .hero-big {
+        font-size: clamp(2rem, 9.5vw, 2.9rem);
+        margin-top: 8px;
+      }
+      .hero-card {
+        height: 230px; padding: 7px; border-width: 3px; border-radius: 22px;
+        animation: heroCardIn 1.3s cubic-bezier(0.16,1,0.3,1) 0.35s both;
+        animation-timeline: auto;
+        animation-range: normal;
+      }
+      .hero-card-inner { border-radius: 15px; }
+
+      .about-grid { grid-template-columns: 1fr; gap: 36px; }
+      .about-img-wrap { order: -1; }
+      .about-stats { order: 2; }
+      .about-h2 { font-size: clamp(1.7rem, 7vw, 2.1rem); }
+
+      .sec-h2 { font-size: clamp(1.7rem, 7vw, 2.1rem); margin-bottom: 32px; }
+
+      .bento { grid-template-columns: 1fr; }
+      .bcard-full { grid-column: 1; }
+      .bcard-split { grid-template-columns: 1fr; }
+      .scene3d { height: 200px; }
+      .scene3d.scene-fill { min-height: 200px; }
+      .tech-logos { gap: 22px; }
+
+      #certifications h2 { font-size: clamp(1.7rem, 7vw, 2.1rem); }
+      .cert-row { gap: 12px; }
+      .cert-pill { padding: 11px 16px; font-size: 13px; }
+
+      #cta-block { padding: 76px 20px; }
+      #cta-block h2 { font-size: clamp(1.9rem, 8vw, 2.4rem); }
+
+      .contact-grid { grid-template-columns: 1fr; gap: 44px; }
+      .contact-h2 { font-size: clamp(1.7rem, 7vw, 2rem); }
+      .ci-wrap { padding-top: 0; }
+
+      .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+    }
+
+    /* Very small phones */
+    @media (max-width: 380px) {
+      .hero-h1 .hero-big { font-size: 26px; }
+      .cert-row { flex-direction: column; align-items: stretch; }
+      .cert-pill { justify-content: center; }
+    }
+
+    @media (min-width: 768px) {
+      #hamburger { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ SVG Glass filter (hidden, referenced by CSS) ══════ -->
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden;">
+  <defs>
+    <filter id="glass-filter" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04 0.04" numOctaves="1" seed="3" result="turbulence"/>
+      <feGaussianBlur in="turbulence" stdDeviation="2" result="blurredNoise"/>
+      <feDisplacementMap in="SourceGraphic" in2="blurredNoise" scale="55" xChannelSelector="R" yChannelSelector="B" result="displaced"/>
+      <feGaussianBlur in="displaced" stdDeviation="3.5" result="finalBlur"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- ═══ Shader background canvas ══════════════════════════ -->
+<canvas id="shader-bg" aria-hidden="true"></canvas>
+
+<!-- ═══ Nav ═══════════════════════════════════════════════ -->
+<nav id="nav" role="navigation" aria-label="Navigation principale">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" aria-label="Pacific Pulse - Accueil">
+      <img src="nav-logo.png" alt="Pacific Pulse" height="20" class="nav-logo-img">
+    </a>
+
+    <ul class="nav-links" role="list">
+      <li><a href="#about">Qui sommes-nous</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#certifications">Certifications</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+
+    <div class="nav-cta" style="display:flex;align-items:center;gap:10px;">
+      <a href="#contact" class="btn btn-primary">Faire un devis</a>
+      <button id="hamburger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mobile-menu">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="19" y2="6"/><line x1="3" y1="11" x2="19" y2="11"/><line x1="3" y1="16" x2="19" y2="16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Menu">
+  <button id="menu-close" aria-label="Fermer le menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+  <a href="#about"          class="m-link">Qui sommes-nous</a>
+  <a href="#services"       class="m-link">Services</a>
+  <a href="#certifications" class="m-link">Certifications</a>
+  <a href="#contact"        class="m-link">Contact</a>
+  <a href="#contact" class="btn btn-primary btn-lg" style="margin-top:28px;">Faire un devis</a>
+</div>
+
+
+<!-- ═══ Hero ═══════════════════════════════════════════════ -->
+<div id="hero-wrap">
+  <div id="hero">
+    <div class="hero-copy">
+      <h1 class="hero-h1"><img src="nav-logo.png" alt="Pacific Pulse" class="hero-logo-img"><span class="hero-big">Votre agence web &amp; <em>design</em> du Pacifique</span></h1>
+    </div>
+
+    <!-- Scroll-tilt card -->
+    <div class="hero-card">
+      <div class="hero-card-inner">
+        <img
+          src="showcase.png"
+          alt="Aperçu d'un site web créé par Pacific Pulse"
+          width="1400" height="875"
+          loading="eager"
+        >
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══ About ══════════════════════════════════════════════ -->
+<section id="about" class="sec">
+  <div class="con">
+    <div class="about-grid">
+      <div class="rev">
+        <h2 class="about-h2">Agence digitale ancrée en Nouvelle-Calédonie</h2>
+        <p class="about-p">Pacific Pulse conçoit des sites web, pilote le marketing digital et bâtit votre stratégie de visibilité. Nous accompagnons les entreprises du Pacifique à se démarquer sur le web.</p>
+        <p class="about-p">Des solutions rapides, efficaces et sur-mesure, portées par des certifications Google et une connaissance fine du marché local.</p>
+        <a href="#contact" class="btn btn-primary btn-animated" style="margin-top:12px;">
+          <span class="btn-text">Démarrer votre projet</span>
+          <span class="btn-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          </span>
+        </a>
+      </div>
+
+      <div class="about-stats rev rev-d2" id="about-stats">
+
+        <!-- 97% -->
+        <div class="stat-card">
+          <div class="stat-ring-wrap">
+            <svg class="stat-ring-svg" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+              <circle class="ring-bg"     cx="32" cy="32" r="26" stroke="rgba(0,31,201,0.18)" stroke-width="5"/>
+              <circle class="ring-stroke" cx="32" cy="32" r="26" stroke="#001fc9" stroke-width="5"
+                stroke-dasharray="163.36" stroke-dashoffset="163.36"
+                data-target="4.9" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+            </svg>
+            <span class="stat-number">97%</span>
+          </div>
+          <div class="stat-text">
+            <div class="stat-sublabel">Des recherches</div>
+            <h4>Visibilité maximale</h4>
+            <p>97 % des consommateurs recherchent un produit en ligne avant d'acheter.</p>
+          </div>
+        </div>
+
+        <!-- 84% -->
+        <div class="stat-card">
+          <div class="stat-ring-wrap">
+            <svg class="stat-ring-svg" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+              <circle class="ring-bg"     cx="32" cy="32" r="26" stroke="rgba(0,31,201,0.18)" stroke-width="5"/>
+              <circle class="ring-stroke" cx="32" cy="32" r="26" stroke="#001fc9" stroke-width="5"
+                stroke-dasharray="163.36" stroke-dashoffset="163.36"
+                data-target="26.14" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+            </svg>
+            <span class="stat-number">84%</span>
+          </div>
+          <div class="stat-text">
+            <div class="stat-sublabel">De confiance</div>
+            <h4>Crédibilité renforcée</h4>
+            <p>84 % font davantage confiance à une entreprise avec un site web professionnel.</p>
+          </div>
+        </div>
+
+        <!-- 78% -->
+        <div class="stat-card">
+          <div class="stat-ring-wrap">
+            <svg class="stat-ring-svg" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+              <circle class="ring-bg"     cx="32" cy="32" r="26" stroke="rgba(0,31,201,0.18)" stroke-width="5"/>
+              <circle class="ring-stroke" cx="32" cy="32" r="26" stroke="#001fc9" stroke-width="5"
+                stroke-dasharray="163.36" stroke-dashoffset="163.36"
+                data-target="35.94" stroke-linecap="round" transform="rotate(-90 32 32)"/>
+            </svg>
+            <span class="stat-number">78%</span>
+          </div>
+          <div class="stat-text">
+            <div class="stat-sublabel">De croissance</div>
+            <h4>Plus de clients</h4>
+            <p>Les PME avec un site web attirent 78 % de clients supplémentaires.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ Services ═══════════════════════════════════════════ -->
+<section id="services" class="sec">
+  <div class="con">
+    <div class="rev">
+      <p class="sec-eyebrow">Nos solutions</p>
+      <h2 class="sec-h2">Des solutions digitales pour faire grandir votre entreprise</h2>
+    </div>
+
+    <div class="bento">
+
+      <!-- Card 1: Landing pages (image + text) -->
+      <div class="bcard rev rev-d1">
+        <div class="scene3d" role="img" aria-label="Animation 3D représentant la conception de sites web">
+          <div class="layers">
+            <div class="layer l3"></div>
+            <div class="layer l2"></div>
+            <div class="layer l1">
+              <span class="ui-bar"></span>
+              <span class="ui-hero"></span>
+              <span class="ui-line"></span>
+              <span class="ui-line short"></span>
+            </div>
+          </div>
+        </div>
+        <div class="bcard-body">
+          <div class="bcard-tag">Sites web</div>
+          <h3>Landing Pages et sites vitrines</h3>
+          <p>Pages ciblées pour capter l'attention et convertir vos visiteurs en prospects. Design premium, optimisation mobile.</p>
+        </div>
+      </div>
+
+      <!-- Card 2: AI (gradient background, no image) -->
+      <div class="bcard grad rev rev-d2">
+        <div class="bcard-body" style="padding:36px 30px 32px;">
+          <div class="bcard-tag">Technologie</div>
+          <h3 style="font-size:24px;margin-bottom:14px;">Optimisé par l'IA</h3>
+          <p>Design accéléré, contenu automatisé, expérience optimisée. L'intelligence artificielle au service de votre visibilité.</p>
+          <div class="tech-logos" aria-label="Technologies utilisées">
+            <img src="https://cdn.simpleicons.org/claude/ffffff" alt="Claude" loading="lazy">
+            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="Visual Studio Code" class="logo-whiten" loading="lazy">
+            <img src="https://cdn.simpleicons.org/hostinger/ffffff" alt="Hostinger" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Community management (split, full width) -->
+      <div class="bcard bcard-full bcard-split rev rev-d3">
+        <div class="bcard-body" style="display:flex;flex-direction:column;justify-content:center;padding:36px 36px;">
+          <div class="bcard-tag">Réseaux sociaux</div>
+          <h3>Community Management</h3>
+          <p>Gestion professionnelle de votre présence sociale. Stratégie de contenu adaptée au marché calédonien et au Pacifique.</p>
+        </div>
+        <div class="scene3d scene-fill" role="img" aria-label="Animation 3D représentant l'univers digital connecté">
+          <div class="gridcube">
+            <div class="cube-face cf-front"></div>
+            <div class="cube-face cf-back"></div>
+            <div class="cube-face cf-right"></div>
+            <div class="cube-face cf-left"></div>
+            <div class="cube-face cf-top"></div>
+            <div class="cube-face cf-bottom"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ Certifications ═════════════════════════════════════ -->
+<section id="certifications" class="sec lg-section">
+  <div class="lg-distort" aria-hidden="true"></div>
+  <div class="lg-rim"     aria-hidden="true"></div>
+
+  <!-- 3D wireframe globe — Pacific -->
+  <div class="globe-bg" aria-hidden="true">
+    <!-- shared gradient -->
+    <svg width="0" height="0" style="position:absolute">
+      <defs>
+        <linearGradient id="islGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"  stop-color="#0040ff"/>
+          <stop offset="100%" stop-color="#001fc9"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="map3d">
+      <div class="map-grid"></div>
+
+      <!-- Nouvelle-Calédonie (Grande Terre + Loyauté + Île des Pins) -->
+      <div class="isl isl-nc">
+        <svg width="172" height="120" viewBox="0 0 200 124">
+          <path d="M12,100 C9,94 13,89 19,86 C23,88 27,85 26,81 C32,80 35,84 41,80 C49,75 55,69 64,63 C68,65 72,62 71,58 C79,53 86,48 95,43 C99,45 103,41 102,38 C111,33 119,28 129,23 C133,25 137,21 137,18 C145,14 153,10 163,9 C170,8 175,13 171,20 C166,28 157,33 148,38 C144,36 140,40 141,44 C133,49 125,54 116,59 C112,57 108,61 109,65 C100,71 91,77 81,82 C77,80 73,84 73,88 C65,92 55,96 44,99 C40,100 36,98 35,101 C30,104 20,106 12,100 Z"/>
+          <path d="M178,66 C184,63 191,66 191,71 C191,76 184,78 179,75 C175,73 174,68 178,66 Z"/>
+          <path d="M186,82 C192,80 198,83 197,88 C196,92 189,93 185,90 C182,88 182,84 186,82 Z"/>
+          <ellipse cx="172" cy="58" rx="5" ry="3.4"/>
+          <ellipse cx="40" cy="113" rx="5.5" ry="4"/>
+        </svg>
+      </div>
+
+      <!-- Wallis & Futuna (Uvea + Futuna + Alofi) -->
+      <div class="isl isl-wf">
+        <svg width="112" height="78" viewBox="0 0 124 86">
+          <path d="M14,34 C13,22 23,13 36,15 C48,17 55,27 53,38 C52,45 47,49 41,49 C42,44 39,40 35,41 C31,42 30,47 33,51 C25,50 17,43 14,34 Z M30,30 C27,31 27,36 31,37 C35,38 37,33 34,30 C33,29 31,29 30,30 Z"/>
+          <path d="M74,42 C82,36 97,39 104,47 C108,52 104,59 95,59 C86,59 76,52 73,46 C72,44 72,43 74,42 Z"/>
+          <path d="M104,64 C109,61 116,63 116,68 C116,72 110,73 105,70 C102,68 101,66 104,64 Z"/>
+        </svg>
+      </div>
+
+      <!-- Tahiti (Tahiti Nui + isthme + Tahiti Iti) -->
+      <div class="isl isl-th">
+        <svg width="124" height="100" viewBox="0 0 140 112">
+          <path d="M16,56 C14,38 24,22 42,17 C58,12 74,17 82,30 C86,37 86,46 82,53 C87,50 92,51 95,55 C95,49 100,45 107,45 C119,45 130,54 130,66 C130,79 120,87 109,86 C102,86 96,82 93,76 C90,82 84,86 77,85 C80,77 78,69 71,66 C73,62 72,57 68,56 C61,68 48,75 35,73 C24,71 17,65 16,56 Z M58,52 C54,53 54,59 59,60 C64,61 66,55 62,52 C61,51 59,51 58,52 Z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="con">
+    <h2 class="rev">Certifiés Google, orientés résultats</h2>
+    <p class="cert-sub rev rev-d1">Nos certifications Google Analytics et Google Ads nous permettent de transformer vos données en moteur de croissance concret pour votre entreprise.</p>
+    <div class="cert-row rev rev-d2">
+      <div class="cert-pill">
+        <img src="https://cdn.simpleicons.org/googleanalytics/ffffff" alt="" width="20" height="20" aria-hidden="true">
+        Google Analytics
+      </div>
+      <div class="cert-pill">
+        <img src="https://cdn.simpleicons.org/googleads/ffffff" alt="" width="20" height="20" aria-hidden="true">
+        Google Ads
+      </div>
+      <div class="cert-pill">
+        <img src="https://cdn.simpleicons.org/google/ffffff" alt="" width="20" height="20" aria-hidden="true">
+        Google Certified Partner
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ CTA block ══════════════════════════════════════════ -->
+<div id="cta-block" class="lg-section">
+  <img
+    src="https://picsum.photos/seed/pacific-island-ocean-blue/1600/700"
+    class="cta-bg"
+    alt=""
+    loading="lazy"
+    aria-hidden="true"
+  >
+  <div class="cta-overlay" aria-hidden="true"></div>
+  <div class="cta-glass"   aria-hidden="true"></div>
+  <div class="lg-distort"  aria-hidden="true" style="z-index:1;mix-blend-mode:screen;opacity:0.6;"></div>
+  <div class="lg-rim"      aria-hidden="true" style="z-index:1;"></div>
+  <div class="cta-content">
+    <h2 class="rev">Votre business a besoin<br>d'un site internet</h2>
+    <p class="rev rev-d1">Vous avez construit quelque chose de solide. Donnez-lui la visibilité qu'il mérite en ligne.</p>
+    <a href="#contact" class="btn btn-primary btn-lg btn-animated rev rev-d2">
+      <span class="btn-text">Faire un devis</span>
+      <span class="btn-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    </a>
+  </div>
+</div>
+
+
+<!-- ═══ Contact ════════════════════════════════════════════ -->
+<section id="contact" class="sec">
+  <div class="con">
+    <div class="contact-grid">
+
+      <!-- Form side -->
+      <div>
+        <h2 class="contact-h2 rev">Parlons de votre projet</h2>
+        <p class="contact-sub rev rev-d1">Une question ou un projet web ? Nous vous répondons rapidement.</p>
+
+        <form id="contact-form" class="rev rev-d2" novalidate>
+          <div class="fg">
+            <label for="f-phone">Téléphone</label>
+            <input type="tel" id="f-phone" name="phone" class="fi" placeholder="+687 XX XX XX" autocomplete="tel">
+          </div>
+          <div class="fg">
+            <label for="f-email">Adresse e-mail</label>
+            <input type="email" id="f-email" name="email" class="fi" placeholder="jean@votreentreprise.nc" required autocomplete="email">
+          </div>
+          <div class="fg">
+            <label for="f-msg">Message</label>
+            <textarea id="f-msg" name="message" class="fi" placeholder="Décrivez votre projet..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Envoyer</button>
+        </form>
+
+        <div id="form-success">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+          Message envoyé. Nous vous répondons dans les 24 heures.
+        </div>
+      </div>
+
+      <!-- Info side -->
+      <div class="ci-wrap rev rev-d2">
+        <h3>Contactez-nous directement</h3>
+
+        <div class="ci">
+          <div class="ci-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+            </svg>
+          </div>
+          <div class="ci-text">
+            <span>Facebook</span>
+            <a href="https://www.facebook.com/PacificPulseNC" target="_blank" rel="noopener">Pacific Pulse NC</a>
+          </div>
+        </div>
+
+        <div class="ci">
+          <div class="ci-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.1a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.22h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <div class="ci-text">
+            <span>Téléphone</span>
+            <a href="tel:+687546660">+687 54 66 60</a>
+          </div>
+        </div>
+
+        <div class="ci">
+          <div class="ci-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <polyline points="22,4 12,13 2,4"/>
+            </svg>
+          </div>
+          <div class="ci-text">
+            <span>Email</span>
+            <a href="mailto:pacificpulsenc@gmail.com">pacificpulsenc@gmail.com</a>
+          </div>
+        </div>
+
+        <div class="ci">
+          <div class="ci-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <div class="ci-text">
+            <span>Localisation</span>
+            <p>Nouméa, Nouvelle-Calédonie</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ Footer ═════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <a href="#" class="footer-logo">
+      <img src="nav-logo.png" alt="Pacific Pulse" height="18" class="footer-logo-img">
+    </a>
+    <p class="footer-copy">© 2026 Pacific Pulse. Tous droits réservés.</p>
+  </div>
+</footer>
+
+
+<script>
+(function() {
+  'use strict';
+
+  /* ── WebGL Shader Background ── */
+  (function() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var canvas = document.getElementById('shader-bg');
+    if (!canvas) return;
+    var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return;
+
+    var vsSource = 'attribute vec4 aVertexPosition; void main() { gl_Position = aVertexPosition; }';
+
+    var fsSource = [
+      'precision highp float;',
+      'uniform vec2 iResolution;',
+      'uniform float iTime;',
+
+      'const float overallSpeed = 0.2;',
+      'const float gridSmoothWidth = 0.015;',
+      'const float axisWidth = 0.05;',
+      'const float majorLineWidth = 0.025;',
+      'const float minorLineWidth = 0.0125;',
+      'const float majorLineFrequency = 5.0;',
+      'const float minorLineFrequency = 1.0;',
+      'const vec4 gridColor = vec4(0.5);',
+      'const float scale = 5.0;',
+      'const vec4 lineColor = vec4(0.0, 0.12, 0.79, 1.0);',
+      'const float minLineWidth = 0.01;',
+      'const float maxLineWidth = 0.2;',
+      'const float lineSpeed = 1.0 * overallSpeed;',
+      'const float lineAmplitude = 1.0;',
+      'const float lineFrequency = 0.2;',
+      'const float warpSpeed = 0.2 * overallSpeed;',
+      'const float warpFrequency = 0.5;',
+      'const float warpAmplitude = 1.0;',
+      'const float offsetFrequency = 0.5;',
+      'const float offsetSpeed = 1.33 * overallSpeed;',
+      'const float minOffsetSpread = 0.6;',
+      'const float maxOffsetSpread = 2.0;',
+      'const int linesPerGroup = 16;',
+
+      '#define drawCircle(pos, radius, coord) smoothstep(radius + gridSmoothWidth, radius, length(coord - (pos)))',
+      '#define drawSmoothLine(pos, halfWidth, t) smoothstep(halfWidth, 0.0, abs(pos - (t)))',
+      '#define drawCrispLine(pos, halfWidth, t) smoothstep(halfWidth + gridSmoothWidth, halfWidth, abs(pos - (t)))',
+      '#define drawPeriodicLine(freq, width, t) drawCrispLine(freq / 2.0, width, abs(mod(t, freq) - (freq) / 2.0))',
+
+      'float drawGridLines(float axis) {',
+      '  return drawCrispLine(0.0, axisWidth, axis)',
+      '       + drawPeriodicLine(majorLineFrequency, majorLineWidth, axis)',
+      '       + drawPeriodicLine(minorLineFrequency, minorLineWidth, axis);',
+      '}',
+
+      'float drawGrid(vec2 space) {',
+      '  return min(1.0, drawGridLines(space.x) + drawGridLines(space.y));',
+      '}',
+
+      'float random(float t) {',
+      '  return (cos(t) + cos(t * 1.3 + 1.3) + cos(t * 1.4 + 1.4)) / 3.0;',
+      '}',
+
+      'float getPlasmaY(float x, float horizontalFade, float offset) {',
+      '  return random(x * lineFrequency + iTime * lineSpeed) * horizontalFade * lineAmplitude + offset;',
+      '}',
+
+      'void main() {',
+      '  vec2 fragCoord = gl_FragCoord.xy;',
+      '  vec4 fragColor;',
+      '  vec2 uv = fragCoord.xy / iResolution.xy;',
+      '  vec2 space = (fragCoord - iResolution.xy / 2.0) / iResolution.x * 2.0 * scale;',
+
+      '  float horizontalFade = 1.0 - (cos(uv.x * 6.28) * 0.5 + 0.5);',
+      '  float verticalFade   = 1.0 - (cos(uv.y * 6.28) * 0.5 + 0.5);',
+
+      '  space.y += random(space.x * warpFrequency + iTime * warpSpeed) * warpAmplitude * (0.5 + horizontalFade);',
+      '  space.x += random(space.y * warpFrequency + iTime * warpSpeed + 2.0) * warpAmplitude * horizontalFade;',
+
+      '  vec4 lines = vec4(0.0);',
+      '  vec4 bgColor1 = vec4(0.94, 0.95, 1.0, 1.0);',
+      '  vec4 bgColor2 = vec4(0.86, 0.90, 1.0, 1.0);',
+
+      '  for(int l = 0; l < linesPerGroup; l++) {',
+      '    float normalizedLineIndex = float(l) / float(linesPerGroup);',
+      '    float offsetTime     = iTime * offsetSpeed;',
+      '    float offsetPosition = float(l) + space.x * offsetFrequency;',
+      '    float rand           = random(offsetPosition + offsetTime) * 0.5 + 0.5;',
+      '    float halfWidth      = mix(minLineWidth, maxLineWidth, rand * horizontalFade) / 2.0;',
+      '    float offset         = random(offsetPosition + offsetTime * (1.0 + normalizedLineIndex)) * mix(minOffsetSpread, maxOffsetSpread, horizontalFade);',
+      '    float linePosition   = getPlasmaY(space.x, horizontalFade, offset);',
+      '    float line           = drawSmoothLine(linePosition, halfWidth, space.y) / 2.0 + drawCrispLine(linePosition, halfWidth * 0.15, space.y);',
+      '    float circleX        = mod(float(l) + iTime * lineSpeed, 25.0) - 12.0;',
+      '    vec2  circlePosition = vec2(circleX, getPlasmaY(circleX, horizontalFade, offset));',
+      '    float circle         = drawCircle(circlePosition, 0.01, space) * 4.0;',
+      '    line = line + circle;',
+      '    lines += line * lineColor * rand;',
+      '  }',
+
+      '  fragColor  = mix(bgColor1, bgColor2, uv.x);',
+      '  fragColor *= verticalFade;',
+      '  fragColor.a = 1.0;',
+      '  fragColor  += lines;',
+      '  gl_FragColor = fragColor;',
+      '}',
+    ].join('\n');
+
+    function compileShader(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        gl.deleteShader(s); return null;
+      }
+      return s;
+    }
+
+    var vs = compileShader(gl.VERTEX_SHADER,   vsSource);
+    var fs = compileShader(gl.FRAGMENT_SHADER, fsSource);
+    if (!vs || !fs) return;
+
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return;
+
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+
+    var aPos  = gl.getAttribLocation(prog, 'aVertexPosition');
+    var uRes  = gl.getUniformLocation(prog, 'iResolution');
+    var uTime = gl.getUniformLocation(prog, 'iTime');
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    var start = Date.now();
+    function render() {
+      var t = (Date.now() - start) / 1000;
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.useProgram(prog);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+      gl.uniform1f(uTime, t);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(aPos);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      requestAnimationFrame(render);
+    }
+    requestAnimationFrame(render);
+  })();
+
+  /* ── Nav: hidden during hero, revealed at #about (no scroll event) ── */
+  const nav = document.getElementById('nav');
+  const heroWrap = document.getElementById('hero-wrap');
+
+  if (heroWrap) {
+    new IntersectionObserver(function(entries) {
+      // hero out of view → we've reached #about → show nav
+      nav.classList.toggle('nav-visible', !entries[0].isIntersecting);
+    }, { threshold: 0 }).observe(heroWrap);
+  }
+
+  /* ── Scroll reveal ── */
+  var revObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) e.target.classList.add('in');
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.rev').forEach(function(el) { revObs.observe(el); });
+
+  /* ── Mobile menu ── */
+  var hamburger   = document.getElementById('hamburger');
+  var mobileMenu  = document.getElementById('mobile-menu');
+  var menuClose   = document.getElementById('menu-close');
+
+  function openMenu() {
+    mobileMenu.classList.add('open');
+    hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    mobileMenu.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  hamburger.addEventListener('click', openMenu);
+  menuClose.addEventListener('click', closeMenu);
+  mobileMenu.querySelectorAll('a').forEach(function(a) {
+    a.addEventListener('click', closeMenu);
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  /* ── Hero card tilt: JS fallback for browsers without animation-timeline (Safari/iOS) ── */
+  (function() {
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var supportsTimeline = (window.CSS && CSS.supports && CSS.supports('animation-timeline', 'scroll()'));
+    // Mobile uses a self-contained CSS entrance animation; desktop Chrome uses CSS scroll-timeline.
+    // This JS only covers desktop browsers without scroll-timeline support.
+    if (reduce || supportsTimeline || window.innerWidth < 768) return;
+
+    var card = document.querySelector('.hero-card');
+    if (!card) return;
+    card.style.willChange = 'transform';
+
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var vh = window.innerHeight || 800;
+      var p = Math.min(1, Math.max(0, (window.pageYOffset || document.documentElement.scrollTop) / (vh * 0.7)));
+      var mobile = window.innerWidth < 768;
+      var maxTilt = mobile ? 16 : 22;
+      var maxScale = mobile ? 0.03 : 0.04;
+      var tilt = (maxTilt * (1 - p)).toFixed(2);
+      var scale = (1 + maxScale * (1 - p)).toFixed(3);
+      card.style.transform = 'rotateX(' + tilt + 'deg) scale(' + scale + ')';
+    }
+    function onScroll() {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+  })();
+
+  /* ── Stats ring animation ── */
+  var statsSection = document.getElementById('about-stats');
+  if (statsSection) {
+    new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        statsSection.querySelectorAll('.ring-stroke').forEach(function(ring) {
+          ring.style.strokeDashoffset = ring.dataset.target;
+        });
+      }
+    }, { threshold: 0.3 }).observe(statsSection);
+  }
+
+  /* ── Contact form ── */
+  var form    = document.getElementById('contact-form');
+  var success = document.getElementById('form-success');
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    form.style.display = 'none';
+    success.style.display = 'block';
+  });
+})();
+</script>
+</body>
+</html>
