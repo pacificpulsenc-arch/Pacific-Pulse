@@ -897,6 +897,19 @@
       transition: color 0.2s ease;
     }
     .ci-text a:hover { color: rgba(160,190,255,0.9); }
+    /* Ligne de contact cliquable (Facebook) */
+    a.ci-link {
+      text-decoration: none;
+      border-radius: var(--r);
+      transition: transform 0.18s ease;
+    }
+    a.ci-link:hover { transform: translateX(2px); }
+    a.ci-link:hover .ci-icon {
+      border-color: rgba(0,31,201,0.45);
+      background: rgba(0,31,201,0.14);
+    }
+    a.ci-link:hover .ci-text p { color: rgba(0,31,201,0.95); }
+    a.ci-link:focus-visible { outline: 2px solid var(--c-blue); outline-offset: 3px; }
 
     /* ─── Liquid glass sections ──────────────────────── */
     .lg-section { position: relative; overflow: hidden; }
@@ -1473,7 +1486,7 @@
       <div class="ci-wrap rev rev-d2">
         <h3>Contactez-nous directement</h3>
 
-        <div class="ci">
+        <a class="ci ci-link" href="https://www.facebook.com/PacificPulseNC" target="_blank" rel="noopener" aria-label="Notre page Facebook Pacific Pulse NC">
           <div class="ci-icon">
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
@@ -1481,9 +1494,9 @@
           </div>
           <div class="ci-text">
             <span>Facebook</span>
-            <a href="https://www.facebook.com/PacificPulseNC" target="_blank" rel="noopener">Pacific Pulse NC</a>
+            <p>Pacific Pulse NC</p>
           </div>
-        </div>
+        </a>
 
         <div class="ci">
           <div class="ci-icon">
