@@ -901,6 +901,7 @@
       box-shadow: 0 0 0 3px rgba(0,31,201,0.18);
     }
     textarea.fi { min-height: 130px; resize: vertical; }
+    .hp { position: absolute; left: -9999px; opacity: 0; height: 0; width: 0; }
     #form-success {
       display: none;
       background: rgba(0,31,201,0.09);
@@ -1521,6 +1522,11 @@
         <p class="contact-sub rev rev-d1">Une question ou un projet web ? Nous vous répondons rapidement.</p>
 
         <form id="contact-form" class="rev rev-d2" novalidate>
+          <!-- Web3Forms : relaie la demande vers pacificpulsenc@gmail.com -->
+          <input type="hidden" name="access_key" value="f2705940-3f8f-40f4-b16d-0bb5451201b7">
+          <input type="hidden" name="subject" value="Nouvelle demande de devis — pacificpulse.fr">
+          <input type="hidden" name="from_name" value="Site Pacific Pulse">
+          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
           <div class="fg">
             <label for="f-phone">Téléphone</label>
             <input type="tel" id="f-phone" name="phone" class="fi" placeholder="+687 XX XX XX" autocomplete="tel">
@@ -1866,8 +1872,30 @@
 
   form.addEventListener('submit', function(e) {
     e.preventDefault();
-    form.style.display = 'none';
-    success.style.display = 'block';
+    if (!form.reportValidity()) return;
+
+    var btn = form.querySelector('button[type="submit"]');
+    var label = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: new FormData(form)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data && data.success) {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      } else {
+        throw new Error((data && data.message) || 'Envoi refusé');
+      }
+    })
+    .catch(function() {
+      if (btn) { btn.disabled = false; btn.textContent = label; }
+      alert('Une erreur est survenue. Écrivez-nous directement à pacificpulsenc@gmail.com');
+    });
   });
 })();
 </script>
